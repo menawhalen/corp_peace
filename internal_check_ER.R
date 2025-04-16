@@ -56,6 +56,10 @@ linkage_results[[1]]
 
 match_test <- getMatches(dfA = sub_org, dfB = sub_market, fl.out = linkage_results[[1]])
 
+matches <- map(linkage_results, ~ getMatches(dfA = sub_org, dfB = sub_market, fl.out = .x))
+
+match <- matches %>% 
+  bind_rows()
 
 # 
 # 
