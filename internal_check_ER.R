@@ -29,12 +29,16 @@ blocking <- blockData(dfA = sub_org, dfB = sub_market, varnames = "headquarters"
 # join_duplicates <- fastLink(dfA = sub_org, dfB = sub_org,
 #                             varnames = c("company_name", "headquarters"),
 #                             return.all = TRUE)
+### issues with / in one marker of morocco
+
+sub_org[568,"company_name"] <- str_replace(sub_org[568,"company_name"], "�", "")
+
 
 # Placeholder for results
 linkage_results <- list()
 
 # Iterate over each block and run fastLink()
-for (i in c(1:22, 25:35)) {
+for (i in c(1:35)) {
   block_pair <- blocking[[i]]  # Get the current blocked dataset
   data_a <- sub_org[block_pair$dfA.inds,]
   data_b <- sub_market[block_pair$dfB.inds,]
@@ -52,11 +56,11 @@ for (i in c(1:22, 25:35)) {
   linkage_results[[i]] <- list(link = fl_out, data_a = data_a, data_b = data_b)
 }
 
-## wont work with 23 or 24
-blocking[[23]]
-sub_org[12321,]
-sub_market[559,]
-## morocco and mauritius not working....
+# ## wont work with 23 or 24
+# blocking[[23]]
+# sub_org[12321,]
+# sub_market[559,]
+# ## morocco and mauritius not working....
 # 
 # bind_cols(linkage_results[[5]]$data_a[linkage_results[[5]]$link$matches$inds.a,],
 #           linkage_results[[5]]$data_b[linkage_results[[5]]$link$matches$inds.b,],
