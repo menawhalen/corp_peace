@@ -2,6 +2,7 @@ library(haven)
 library(tidyverse)
 library(janitor)
 library(fastLink)
+set.seed("417")
 ## market line
 market <- read_dta("data/BHR foreign companies.dta") %>% clean_names()
 
@@ -55,8 +56,8 @@ matched_ungc <- test_match %>%
   select(company_name, headquarters, ungc_date_joined, ungc_posterior_match)
 
 
-market_ungc <- sub_market %>% 
-  left_join(matched_ungc, by = join_by(company_name, headquarters)) 
+# market_ungc <- sub_market %>% 
+#   left_join(matched_ungc, by = join_by(company_name, headquarters)) 
 
 
 #######################################################
@@ -113,10 +114,14 @@ matched_bhrrc <- match_bhrrc %>%
   rename( bhrrc_posterior_match = posterior) 
 
 market_ungc_bhrrc <- market %>% 
-  select(company_name, country_location, headquarters, revenue_per_employee_usd, no_of_employees, sales_growth, incorporation_year) %>% 
+  select(id, company_name, country_location, headquarters, revenue_per_employee_usd, no_of_employees, sales_growth, incorporation_year) %>% 
   mutate(company_name = str_to_lower(company_name),
          headquarters = str_to_lower(headquarters),
          country_location = str_to_lower(country_location)) %>% 
   left_join(matched_ungc, by = join_by(company_name, headquarters)) %>% 
   left_join(matched_bhrrc, by = join_by(company_name, headquarters, country_location)) %>% 
   mutate(in_ungc = ifelse(is.na(ungc_date_joined), 0, 1)) 
+## there were multiple rows of similar data
+market_ungc_bhrrc[duplicated(market_ungc_bhrrc),]
+## 554 rows duplicated so removed
+write_csv(distinct(market_ungc_bhrrc), "data/market_ungc_bhrrc.csv")
